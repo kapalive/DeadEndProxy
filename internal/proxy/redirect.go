@@ -9,8 +9,9 @@ import (
 )
 
 // startHTTPRedirect запускает редирект HTTP → HTTPS
-func startHTTPRedirect(cfg *config.Config) {
+func startHTTPRedirect() {
 	go func() {
+		cfg := config.GetConfig() // ✅ теперь он сам знает, где взять актуальный конфиг
 		addr := ":" + strconv.Itoa(cfg.Server.HTTPPort)
 		log.Printf("🌐 HTTP: %s (redirect → HTTPS)", addr)
 

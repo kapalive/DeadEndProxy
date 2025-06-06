@@ -16,7 +16,7 @@ func writeErrorPage(w http.ResponseWriter, status int) {
 	body := fmt.Sprintf(`<html>
 <head><title>%d %s</title></head>
 <body>
-<center><h1>DevinsiderProxy %d %s</h1></center>
+<center><h1>Devinsider Proxy %d %s</h1></center>
 </body>
 </html>`, status, text, status, text)
 	_, _ = w.Write([]byte(body))

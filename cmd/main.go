@@ -1,6 +1,7 @@
 package main
 
 import (
+	"DeadEndProxy/config"
 	"DeadEndProxy/internal/router"
 	"flag"
 	"fmt"
@@ -22,6 +23,12 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
+
+	const configPath = "config.yaml"
+
+	// ✅ Загружаем конфиг и включаем hot-reload
+	config.MustLoadInitial(configPath)
+	config.WatchAndReload(configPath)
 
 	redisClient := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379"})
 	resolver := router.NewResolver(redisClient)

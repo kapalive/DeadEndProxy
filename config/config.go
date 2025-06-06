@@ -1,9 +1,12 @@
 package config
 
 import (
+	"github.com/fsnotify/fsnotify"
+	"log"
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"gopkg.in/yaml.v3"
 )
@@ -45,18 +48,12 @@ type yamlDomain struct {
 	Routes []LocationConfig `yaml:"routes"`
 }
 
-type yamlService struct {
-	Name string `yaml:"name"`
-	Run  string `yaml:"run"`
-}
-
 type yamlConfig struct {
 	Listen struct {
 		HTTP  string `yaml:"http"`
 		HTTPS string `yaml:"https"`
 	} `yaml:"listen"`
-	Domains  []yamlDomain  `yaml:"domains"`
-	Services []yamlService `yaml:"services,omitempty"`
+	Domains []yamlDomain `yaml:"domains"`
 }
 
 type Config struct {
@@ -138,4 +135,56 @@ func parsePort(p string) int {
 func mustAtoi(s string) int {
 	n, _ := strconv.Atoi(s)
 	return n
+}
+
+var (
+	currentConfig *Config
+	configMu      sync.RWMutex
+)
+
+func GetConfig() *Config {
+	configMu.RLock()
+	defer configMu.RUnlock()
+	return currentConfig
+}
+
+func MustLoadInitial(path string) {
+	cfg, err := LoadConfig(path)
+	if err != nil {
+		panic("config load error: " + err.Error())
+	}
+	configMu.Lock()
+	currentConfig = cfg
+	configMu.Unlock()
+}
+
+func WatchAndReload(path string) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal("fsnotify error:", err)
+	}
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					log.Println("[config] Detected change in config.yaml. Reloading...")
+					cfg, err := LoadConfig(path)
+					if err != nil {
+						log.Println("[config] Reload error:", err)
+						continue
+					}
+					configMu.Lock()
+					currentConfig = cfg
+					configMu.Unlock()
+					log.Println("[config] Reloaded successfully.")
+				}
+			case err := <-watcher.Errors:
+				log.Println("[config] Watcher error:", err)
+			}
+		}
+	}()
+	if err := watcher.Add(path); err != nil {
+		log.Fatal("watcher.Add:", err)
+	}
 }
