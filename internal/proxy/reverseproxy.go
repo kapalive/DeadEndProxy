@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"log"
+	"net/http"
 	"net/http/httputil"
 	"net/url"
 )
@@ -12,7 +13,11 @@ func NewSingleHostReverseProxy(target string) *httputil.ReverseProxy {
 	if err != nil {
 		log.Fatalf("Invalid proxy target: %s — %v", target, err)
 	}
-	return httputil.NewSingleHostReverseProxy(u)
+	rp := httputil.NewSingleHostReverseProxy(u)
+	rp.ErrorHandler = func(w http.ResponseWriter, r *http.Request, e error) {
+		writeErrorPage(w, http.StatusGatewayTimeout)
+	}
+	return rp
 }
 
 // NewWebSocketReverseProxy — WebSocket proxy (на основе обычного)
