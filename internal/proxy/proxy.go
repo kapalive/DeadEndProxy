@@ -66,9 +66,15 @@ func startHTTPSProxy(resolver *router.Resolver) {
 	if err != nil {
 		log.Fatal("TLS Main cert load failed:", err)
 	}
-	secondCert, err := tls.LoadX509KeyPair(cfg.Server.SSLCertSecond, cfg.Server.SSLKeySecond)
-	if err != nil {
-		log.Fatal("TLS Second cert load failed:", err)
+	var secondCert tls.Certificate
+	secondCertConfigured := cfg.Server.SSLCertSecond != "" && cfg.Server.SSLKeySecond != ""
+
+	if secondCertConfigured {
+		var err error
+		secondCert, err = tls.LoadX509KeyPair(cfg.Server.SSLCertSecond, cfg.Server.SSLKeySecond)
+		if err != nil {
+			log.Fatal("TLS Second cert load failed:", err)
+		}
 	}
 
 	tlsCfg := &tls.Config{
@@ -86,7 +92,8 @@ func startHTTPSProxy(resolver *router.Resolver) {
 				return &mainCert, nil
 			}
 			host := strings.ToLower(hello.ServerName)
-			if strings.Contains(host, strings.ToLower(cfg.Server.DomainSecond)) {
+
+			if secondCertConfigured && strings.Contains(host, strings.ToLower(cfg.Server.DomainSecond)) {
 				return &secondCert, nil
 			}
 			return &mainCert, nil

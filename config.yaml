@@ -5,8 +5,8 @@ listen:
 domains:
   - domain: picture-proof.com
     ssl:
-      cert: /home/cat/certs/fullchain.pem
-      key: /home/cat/private/picture-proof.com-PrivateKey.pem
+      cert_file: /etc/letsencrypt/live/picture-proof.com/fullchain.pem
+      key_file: /etc/letsencrypt/live/picture-proof.com/privkey.pem
     redirect_to_https: true
     routes:
       - path: "/core/"
@@ -15,4 +15,3 @@ domains:
         proxy_pass: "http://localhost:9090"
       - path: "/"
         proxy_pass: "http://localhost:3000"
-        
