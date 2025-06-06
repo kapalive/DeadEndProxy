@@ -6,7 +6,7 @@ domains:
   - domain: picture-proof.com
     ssl:
       cert_file: /etc/letsencrypt/live/picture-proof.com/fullchain.pem
-      key_file: /etc/letsencrypt/live/picture-proof.com/privkey.pem
+      key_file: /etc/letsencrypt/live/picture-proof.com/picture-proof.com-PrivateKey.pem
     redirect_to_https: true
     routes:
       - path: "/core/"

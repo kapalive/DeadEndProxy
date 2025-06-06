@@ -42,8 +42,8 @@ type yamlDomain struct {
 	RedirectToHTTPS bool   `yaml:"redirect_to_https"`
 	RedirectTo      string `yaml:"redirect_to,omitempty"`
 	SSL             *struct {
-		Cert string `yaml:"cert"`
-		Key  string `yaml:"key"`
+		CertFile string `yaml:"cert_file"`
+		KeyFile  string `yaml:"key_file"`
 	} `yaml:"ssl,omitempty"`
 	Routes []LocationConfig `yaml:"routes"`
 }
@@ -90,8 +90,8 @@ func LoadConfig(path string) (*Config, error) {
 		main := ycfg.Domains[0]
 		domainMain = main.Domain
 		if main.SSL != nil {
-			certMain = main.SSL.Cert
-			keyMain = main.SSL.Key
+			certMain = main.SSL.CertFile
+			keyMain = main.SSL.KeyFile
 		}
 		for _, route := range main.Routes {
 			route.Domain = main.Domain
@@ -103,8 +103,8 @@ func LoadConfig(path string) (*Config, error) {
 		second := ycfg.Domains[1]
 		domainSecond = second.Domain
 		if second.SSL != nil {
-			certSecond = second.SSL.Cert
-			keySecond = second.SSL.Key
+			certSecond = second.SSL.CertFile
+			keySecond = second.SSL.KeyFile
 		}
 		for _, route := range second.Routes {
 			route.Domain = second.Domain

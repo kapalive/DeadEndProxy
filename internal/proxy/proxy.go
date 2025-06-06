@@ -5,14 +5,17 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"DeadEndProxy/config"
 	"DeadEndProxy/internal/security"
 )
+
+var domainMuxCache = make(map[string]*http.ServeMux)
+var muxMu sync.Mutex
 
 // Main Start
 func Start(_ *config.Config, resolver *router.Resolver) {
@@ -132,30 +135,33 @@ func buildRootHandler(_ *config.Config, resolver *router.Resolver) http.Handler 
 }
 
 func buildDomainHandler(cfg *config.Config, domain string) http.Handler {
+	muxMu.Lock()
+	defer muxMu.Unlock()
+
+	if mux, ok := domainMuxCache[domain]; ok {
+		return mux
+	}
+
 	mux := http.NewServeMux()
+	registered := make(map[string]bool)
 
-	// Static для главного домена
-	if strings.EqualFold(domain, cfg.Server.DomainMain) {
-		fs := http.FileServer(http.Dir(cfg.Server.Webroot))
-		mux.Handle("/static/", http.StripPrefix("/static/", fs))
-		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			path := cfg.Server.Webroot + r.URL.Path
-			if _, err := os.Stat(path); err != nil {
-				http.ServeFile(w, r, cfg.Server.Webroot+"/index.html")
-				return
-			}
-			fs.ServeHTTP(w, r)
-		})
-	}
-
-	// Прокси по локациям
+	// 🔁 Пройдём по всем роутам из YAML
 	for _, loc := range cfg.Server.Locations {
-		if strings.EqualFold(loc.Domain, domain) {
-			handler := createProxyHandler(loc)
-			mux.Handle(loc.Path, handler)
+		if !strings.EqualFold(loc.Domain, domain) {
+			continue
 		}
+
+		if registered[loc.Path] {
+			log.Printf("⚠️  Skipping duplicate path registration: %s for domain %s", loc.Path, domain)
+			continue
+		}
+
+		handler := createProxyHandler(loc)
+		mux.Handle(loc.Path, handler)
+		registered[loc.Path] = true
 	}
 
+	domainMuxCache[domain] = mux
 	return mux
 }
 
