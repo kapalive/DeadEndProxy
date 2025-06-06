@@ -15,7 +15,7 @@ func createDynamicHandler(resolver *router.Resolver) http.Handler {
 
 		entry, err := resolver.ResolveDomain(ctx, host)
 		if err != nil || entry == nil {
-			http.Error(w, "Domain not registered", http.StatusBadGateway)
+			writeErrorPage(w, http.StatusBadGateway)
 			return
 		}
 
