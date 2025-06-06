@@ -1,0 +1,23 @@
+listen:
+  http: ":80"
+  https: ":443"
+
+domains:
+  - domain: picture-proof.com
+    ssl:
+      cert: /home/cat/certs/fullchain.pem
+      key: /home/cat/private/picture-proof.com-PrivateKey.pem
+    redirect_to_https: true
+    routes:
+      - path: "/core/"
+        proxy_pass: "http://localhost:8085"
+      - path: "/storage/"
+        proxy_pass: "http://localhost:9090"
+      - path: "/"
+        proxy_pass: "http://localhost:3000"
+
+services:
+  - name: frontend
+    run: "cd /home/cat/application2/nextjs-deploy/ && pm2 start ecosystem.config.js --name frontend"
+  - name: storage
+    run: "/home/cat/storage/picture-proof/storage"
