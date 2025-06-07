@@ -48,7 +48,7 @@ func FakeErrorMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Тут можно случайно вернуть 403, 404, 500 — обманка
 		// или подменять заголовки на несуществующие
-		w.Header().Set("Server", "nginx/1.18.0 (Ubuntu)")
+		w.Header().Set("Server", "Devinsider Proxy/1.0.0 (Ubuntu)")
 		next.ServeHTTP(w, r)
 	})
 }
