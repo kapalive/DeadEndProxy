@@ -162,6 +162,53 @@ On incoming request:
     If not found → API call to
     http://127.0.0.1:8080/core/domains/resolve?domain=<domain>
 
+
+🐡 BSD Manual Install (FreeBSD / TrueNAS / HardenedBSD)
+```
+pkg install -y go git
+cd /usr/local/src
+git clone https://github.com/devinsidercode/DeadEndProxy.git
+cd DeadEndProxy
+go build -o deadendproxy-bin ./cmd
+mkdir -p /usr/local/etc/deadendproxy/webroot/static
+cp config.yaml /usr/local/etc/deadendproxy/
+cp webroot/static/logo-full.png /usr/local/etc/deadendproxy/webroot/static/
+cp deadendproxy-bin /usr/local/sbin/
+```
+
+Create rc.d script
+
+Save to /usr/local/etc/rc.d/deadendproxy:
+```
+#!/bin/sh
+# PROVIDE: deadendproxy
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+. /etc/rc.subr
+
+name="deadendproxy"
+rcvar=deadendproxy_enable
+
+load_rc_config $name
+: ${deadendproxy_enable:="NO"}
+
+pidfile="/var/run/${name}.pid"
+deadendproxy_command="/usr/local/sbin/deadendproxy-bin"
+deadendproxy_flags="-config /usr/local/etc/deadendproxy/config.yaml -port-http 80 -port-proxy 443"
+
+command="/usr/sbin/daemon"
+command_args="-f -p ${pidfile} ${deadendproxy_command} ${deadendproxy_flags}"
+
+run_rc_command "$1"
+```
+
+```
+chmod +x /usr/local/etc/rc.d/deadendproxy
+sysrc deadendproxy_enable=YES
+service deadendproxy start
+```
+
+
 This allows customer domains to be dynamically routed based on their DNS or backend configuration.
 🧼 Uninstall
 
@@ -172,6 +219,14 @@ sudo rm /usr/local/bin/deadendproxy-bin
 sudo rm /etc/systemd/system/deadendproxy.service
 sudo rm -rf /etc/deadendproxy
 sudo userdel deadendproxy
+```
+
+Or on BSD:
+```
+service deadendproxy stop
+rm /usr/local/etc/rc.d/deadendproxy
+rm -rf /usr/local/etc/deadendproxy
+rm /usr/local/sbin/deadendproxy-bin
 ```
 
 © 2023 Devinsidercode CORP. Licensed under the MIT License.
