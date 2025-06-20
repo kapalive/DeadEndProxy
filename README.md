@@ -74,6 +74,8 @@ go build -o deadendproxy-bin ./cmd
 Put your config.yaml in /etc/deadendproxy/config.yaml.
 Minimal example:
 ```yaml
+server:
+  webroot: ./webroot
 listen:
   http: ":80"
   https: ":443"
