@@ -81,12 +81,12 @@ listen:
 domains:
   - domain: picture-proof.com
     ssl:
-      cert_file: /etc/letsencrypt/live/picture-proof.com/fullchain.pem
-      key_file: /etc/letsencrypt/live/picture-proof.com/privkey.pem
+      cert_file: /etc/letsencrypt/live/your-domain.com/fullchain.pem
+      key_file: /etc/letsencrypt/live/your-domain.com/privkey.pem
     redirect_to_https: true
     routes:
-      - path: "/core/"
-        proxy_pass: "http://127.0.0.1:8085"
+      - path: "/api/"
+        proxy_pass: "http://127.0.0.1:8080"
       - path: "/storage/"
         proxy_pass: "http://127.0.0.1:9090"
       - path: "/"
