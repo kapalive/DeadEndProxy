@@ -22,7 +22,7 @@ Perfect for SaaS platforms where each customer brings their own domain.
 ---
 
 ## 🛠 Project Structure
-
+```
 DeadEndProxy/
 ├── LICENSE
 ├── README.md
@@ -60,7 +60,7 @@ DeadEndProxy/
 └── webroot/
 └── static/
 └── logo-full.png # Static asset
-
+```
 
 ---
 
