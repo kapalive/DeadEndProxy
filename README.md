@@ -1,125 +1,177 @@
 # DeadEndProxy
 
-DeadEndProxy is a lightweight reverse proxy written in Go. The proxy reads a YAML
-configuration file and supports automatic reloads when the file changes. Dynamic
-routing is resolved through Redis caching, DNS TXT records and a fallback core
-API.
+DeadEndProxy is a lightweight reverse proxy written in Go.  
+It reads a YAML configuration file and supports hot reload, TLS with SNI, dynamic domain routing via Redis, DNS TXT, and fallback API.  
+Perfect for SaaS platforms where each customer brings their own domain.
 
 ---
 
 ## ✨ Features
 
-- HTTP & HTTPS proxying with optional redirect from HTTP to HTTPS
-- Dynamic domain resolution via:
-   - Redis cache
-   - DNS TXT records
-   - Core API fallback
-- YAML-based configuration with hot reload
-- Ready to run as a `systemd` service on Linux
-- No Nginx or Apache required
+- 🧩 Dynamic domain resolution via:
+    - Redis cache (`routing:<domain>`)
+    - DNS TXT records (`username_website_<user>`)
+    - Core API fallback
+- ⚡ Fast Go-based reverse proxy with HTTP & HTTPS
+- 🔁 Hot-reloadable YAML config (`config.yaml`)
+- 🔐 TLS with SNI support
+- 🧾 `systemd` integration with ready-to-use service file
+- 🖼 Static assets support (`/static/`)
+- 🛠 No need for Nginx or Apache
 
 ---
 
-## Building
+## 🛠 Project Structure
+
+DeadEndProxy/
+├── LICENSE
+├── README.md
+├── assets/
+│ └── embed.go
+├── cmd/
+│ └── main.go
+├── config/
+│ └── config.go
+├── config.yaml # Example config
+├── deadendproxy-bin # Compiled binary
+├── devinsider-proxy-v1.0 # Optional release artifact
+├── go.mod
+├── go.sum
+├── install.sh # Full auto-install script
+├── internal/
+│ ├── proxy/
+│ │ ├── cors.go
+│ │ ├── dynamic.go
+│ │ ├── errorpage.go
+│ │ ├── override.go
+│ │ ├── proxy.go
+│ │ ├── redirect.go
+│ │ ├── reverseproxy.go
+│ │ └── router.go
+│ ├── router/
+│ │ └── resolver.go
+│ └── security/
+│ └── security.go
+├── scripts/
+│ └── deadendproxy # CLI wrapper script
+├── systemd/
+│ └── deadendproxy.service # systemd unit file
+├── test.png # Debug downloaded image
+└── webroot/
+└── static/
+└── logo-full.png # Static asset
+
+
+---
+
+## ⚙️ Building
 
 ```bash
-# build the binary
-GOOS=linux GOARCH=amd64 go build -o deadendproxy-bin ./cmd
+go build -o deadendproxy-bin ./cmd
+````
+🧾 Configuration
+
+Put your config.yaml in /etc/deadendproxy/config.yaml.
+Minimal example:
+```yaml
+listen:
+  http: ":80"
+  https: ":443"
+
+domains:
+  - domain: picture-proof.com
+    ssl:
+      cert_file: /etc/letsencrypt/live/picture-proof.com/fullchain.pem
+      key_file: /etc/letsencrypt/live/picture-proof.com/privkey.pem
+    redirect_to_https: true
+    routes:
+      - path: "/core/"
+        proxy_pass: "http://127.0.0.1:8085"
+      - path: "/storage/"
+        proxy_pass: "http://127.0.0.1:9090"
+      - path: "/"
+        proxy_pass: "http://127.0.0.1:3000"
 ```
+Don't forget to place your static files like logo-full.png into:
 
-## Configuration
+/etc/deadendproxy/webroot/static/
 
-routes:
-- domain: picture-proof.com
-  target: http://127.0.0.1:5000
+🚀 Quick Install
 
-- domain: manage.eyesync.app
-  target: http://127.0.0.1:7000
+chmod +x install.sh
+./install.sh
 
+The script will:
 
+    Create /etc/deadendproxy/ and copy config.yaml and static files
 
-The default configuration file is `config.yaml`. Copy it to `/etc/deadendproxy/config.yaml`
-and edit it to define your domains and routes.
+    Compile the binary and copy it to /usr/local/bin/
 
-## Running as a service
+    Install the systemd unit
 
-An example `systemd` service file is provided in `systemd/deadendproxy.service`.
-Install it to `/etc/systemd/system/deadendproxy.service` and reload systemd:
+    Reload and restart the service
 
+🧰 Manual systemd Setup
+
+# Compile and set permissions
 ```bash
-sudo mkdir /etc/deadendproxy/
-sudo setcap 'cap_net_bind_service=+ep' ./deadendproxy-bin
-
-./deadendproxy-bin \
-  -config /etc/deadendproxy/config.yaml \
-  -port-http 80 \
-  -port-proxy 443
-  
-
-```
-/etc/systemd/system/deadendproxy.service
-
-```vim
-[Unit]
-Description=DeadEnd Reverse Proxy
-After=network.target
-
-[Service]
-User=deadendproxy
-Group=deadendproxy
-WorkingDirectory=/etc/deadendproxy
-ExecStart=/usr/local/bin/deadendproxy-bin -config /etc/deadendproxy/config.yaml -port-http 80 -port-proxy 443
-Restart=always
-RestartSec=2
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```bash
-sudo useradd --system --no-create-home --shell /usr/sbin/nologin deadendproxy
-sudo mkdir -p /etc/deadendproxy
-sudo cp config.yaml /etc/deadendproxy/
-sudo chown -R deadendproxy:deadendproxy /etc/deadendproxy
-sudo chmod 640 /etc/deadendproxy/config.yaml
-
+go build -o deadendproxy-bin ./cmd
+sudo cp deadendproxy-bin /usr/local/bin/
 sudo setcap 'cap_net_bind_service=+ep' /usr/local/bin/deadendproxy-bin
 ```
 
-After installation you can manage the proxy like any other service:
-
+# Copy config and static files
 ```bash
+sudo mkdir -p /etc/deadendproxy/webroot/static/
+sudo cp config.yaml /etc/deadendproxy/
+sudo cp webroot/static/logo-full.png /etc/deadendproxy/webroot/static/
+```
+
+# Add user
+```bash
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin deadendproxy
+sudo chown -R deadendproxy:deadendproxy /etc/deadendproxy
+```
+
+# Copy and enable systemd service
+```bash
+sudo cp systemd/deadendproxy.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now deadendproxy
-
-sudo systemctl stop deadendproxy
 ```
 
-## Editing the config quickly
-
-A helper script `scripts/deadendproxy` opens the configuration file when invoked
-with the `config` argument. Copy the script and binary to `/usr/local/bin`:
+🔁 Editing config live
 
 ```bash
-sudo cp deadendproxy-bin /usr/local/bin/
-sudo cp scripts/deadendproxy /usr/local/bin/deadendproxy
+sudo deadendproxy config
 ```
 
-Now running `sudo deadendproxy config` opens `/etc/deadendproxy/config.yaml` in
-`$EDITOR` (defaults to `nano`). Other arguments are forwarded to the binary.
+This opens /etc/deadendproxy/config.yaml in $EDITOR (default: nano).
+You can symlink a helper script for convenience:
 
-## Dynamic routing via DNS TXT records
+sudo cp scripts/deadendproxy /usr/local/bin/deadendproxy
 
-When a request arrives, the resolver performs the following steps in order:
+🌐 Dynamic Routing via DNS TXT
 
-1. Check Redis for a cached entry `routing:<domain>`.
-2. If not found, lookup TXT records for the domain. A record in the format
-   `username_website_<USER>` indicates that requests should be proxied to the
-   service for `<USER>` (by default `http://127.0.0.1:9999`). The result is cached
-   in Redis for one hour.
-3. If no TXT record is present, the resolver queries the core API at
-   `http://127.0.0.1:8080/core/domains/resolve?domain=<domain>` to determine the
-   target, then caches the result.
+On incoming request:
 
-This mechanism allows customers to point their own domain at the proxy and
-control routing using a simple DNS TXT entry.
+    Check Redis: routing:<domain>
+
+    If not found → TXT record like username_website_john
+
+    If not found → API call to
+    http://127.0.0.1:8080/core/domains/resolve?domain=<domain>
+
+This allows customer domains to be dynamically routed based on their DNS or backend configuration.
+🧼 Uninstall
+
+```bash
+sudo systemctl stop deadendproxy
+sudo systemctl disable deadendproxy
+sudo rm /usr/local/bin/deadendproxy-bin
+sudo rm /etc/systemd/system/deadendproxy.service
+sudo rm -rf /etc/deadendproxy
+sudo userdel deadendproxy
+```
+
+© 2023 Devinsidercode CORP. Licensed under the MIT License.

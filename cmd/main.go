@@ -1,3 +1,4 @@
+// © 2023 Devinsidercode CORP. Licensed under the MIT License.
 package main
 
 import (
@@ -5,6 +6,7 @@ import (
 	"DeadEndProxy/internal/router"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 
 	"DeadEndProxy/internal/proxy"
@@ -39,6 +41,10 @@ func main() {
 	redisClient := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379"})
 	resolver := router.NewResolver(redisClient)
 
+	// Serve static files
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("webroot/static"))))
+
+	// Start proxy
 	proxy.StartWithOverride(&proxy.ConfigOverride{
 		HTTPPort:  *portHTTP,
 		HTTPSPort: *portHTTPS,

@@ -1,3 +1,4 @@
+// © 2023 Devinsidercode CORP. Licensed under the MIT License.
 package proxy
 
 import (
@@ -5,6 +6,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -119,6 +121,14 @@ func startHTTPSProxy(resolver *router.Resolver) {
 // (root)
 func buildRootHandler(_ *config.Config, resolver *router.Resolver) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Serve static assets
+		if strings.HasPrefix(r.URL.Path, "/static/") {
+			cfg := config.GetConfig()
+			dir := filepath.Join(cfg.Server.Webroot, "static")
+			fs := http.FileServer(http.Dir(dir))
+			http.StripPrefix("/static/", fs).ServeHTTP(w, r)
+			return
+		}
 		domain := strings.ToLower(r.Host)
 
 		// 🧠 Берём актуальный конфиг на каждый запрос
