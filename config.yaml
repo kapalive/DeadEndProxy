@@ -6,22 +6,22 @@ listen:
   https: ":443"
 
 domains:
-  - domain: picture-proof.com
+  - domain: your-domain.com
     ssl:
-      cert_file: /etc/letsencrypt/live/picture-proof.com/fullchain.pem
-      key_file: /etc/letsencrypt/live/picture-proof.com/picture-proof.com-PrivateKey.pem
+      cert_file: /etc/letsencrypt/live/your-domain.com/fullchain.pem
+      key_file: /etc/letsencrypt/live/your-domain.com/privateKey.pem
     redirect_to_https: true
     routes:
       - path: "/core/"
-        proxy_pass: "http://localhost:8085"
+        proxy_pass: "http://localhost:8080"
       - path: "/storage/"
         proxy_pass: "http://localhost:9090"
       - path: "/"
         proxy_pass: "http://localhost:3000"
   - domain: manage.eyesync.app             # новый поддомен
     ssl:
-      cert_file: /etc/letsencrypt/live/eyesync.app/fullchain.pem
-      key_file: /etc/letsencrypt/live/eyesync.app/privkey.pem
+      cert_file: /etc/letsencrypt/live/my-domain.app/fullchain.pem
+      key_file: /etc/letsencrypt/live/my-domain.app/privkey.pem
     redirect_to_https: true
     routes:
       - path: "/"
