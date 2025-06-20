@@ -79,7 +79,7 @@ listen:
   https: ":443"
 
 domains:
-  - domain: picture-proof.com
+  - domain: your-domain.com
     ssl:
       cert_file: /etc/letsencrypt/live/your-domain.com/fullchain.pem
       key_file: /etc/letsencrypt/live/your-domain.com/privkey.pem
