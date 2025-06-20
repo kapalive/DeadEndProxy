@@ -24,11 +24,17 @@ func main() {
 		os.Exit(0)
 	}
 
-	const configPath = "config.yaml"
+	configPath := flag.String("config", "config.yaml", "Path to config file")
+	flag.Parse()
 
-	// ✅ Загружаем конфиг и включаем hot-reload
-	config.MustLoadInitial(configPath)
-	config.WatchAndReload(configPath)
+	if *help {
+		fmt.Println("Usage of DeadEndProxy:")
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	config.MustLoadInitial(*configPath)
+	config.WatchAndReload(*configPath)
 
 	redisClient := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379"})
 	resolver := router.NewResolver(redisClient)

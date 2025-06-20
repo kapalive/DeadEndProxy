@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+CONFIG_PATH="/etc/deadendproxy/config.yaml"
+BINARY="/usr/local/bin/deadendproxy-bin"
+
+if [ "$1" = "config" ]; then
+    ${EDITOR:-nano} "$CONFIG_PATH"
+else
+    exec "$BINARY" "$@"
+fi
