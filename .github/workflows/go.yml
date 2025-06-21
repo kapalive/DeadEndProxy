@@ -1,0 +1,57 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-linux:
+    name: Build on Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Build
+        run: go build ./...
+
+      - name: Run tests
+        run: go test ./...
+
+  build-bsd:
+    name: Build on FreeBSD
+    runs-on: ubuntu-latest  # базовая ОС, внутри запускается VM
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run in FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: '13.2'  # можно выбрать нужную версию FreeBSD
+          mem: 2048
+          prepare: |
+            pkg install -y go git
+          run: |
+            go version
+            go build ./...
+            go test ./...
