@@ -57,11 +57,13 @@ type yamlConfig struct {
 		HTTP  string `yaml:"http"`
 		HTTPS string `yaml:"https"`
 	} `yaml:"listen"`
-	Domains []yamlDomain `yaml:"domains"`
+	Domains []yamlDomain      `yaml:"domains"`
+	Headers map[string]string `yaml:"headers"`
 }
 
 type Config struct {
-	Server ServerConfig
+	Server  ServerConfig
+	Headers map[string]string
 }
 
 // ===== Loading config =====
@@ -74,7 +76,6 @@ func MustLoadConfig(path string) *Config {
 	}
 	return cfg
 }
-
 
 // LoadConfig reads the YAML config from disk and converts
 // it into the internal Config structure.
@@ -134,6 +135,7 @@ func LoadConfig(path string) (*Config, error) {
 			Webroot:       "./webroot", // default
 			Locations:     allLocations,
 		},
+		Headers: ycfg.Headers,
 	}, nil
 }
 

@@ -5,6 +5,7 @@
 package security
 
 import (
+	"DeadEndProxy/config"
 	"log"
 	"net/http"
 	"strings"
@@ -15,12 +16,25 @@ import (
 // headers on each response.
 func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
-		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("Permissions-Policy", "geolocation=(), microphone=()")
+		headers := map[string]string{
+			"Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+			"X-Content-Type-Options":    "nosniff",
+			"X-Frame-Options":           "DENY",
+			"X-XSS-Protection":          "1; mode=block",
+			"Referrer-Policy":           "strict-origin-when-cross-origin",
+			"Permissions-Policy":        "geolocation=(), microphone()",
+		}
+
+		cfg := config.GetConfig()
+		if cfg != nil && cfg.Headers != nil {
+			for k, v := range cfg.Headers {
+				headers[k] = v
+			}
+		}
+
+		for k, v := range headers {
+			w.Header().Set(k, v)
+		}
 		next.ServeHTTP(w, r)
 	})
 }
