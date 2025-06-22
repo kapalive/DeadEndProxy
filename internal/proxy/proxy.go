@@ -1,4 +1,7 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package proxy contains the HTTP/HTTPS proxy server implementation
+// with TLS, static file handling and dynamic routing support.
 package proxy
 
 import (
@@ -19,17 +22,20 @@ import (
 var domainMuxCache = make(map[string]*http.ServeMux)
 var muxMu sync.Mutex
 
-// Main Start
+// Start launches both HTTP redirect and HTTPS proxy servers
+// using the provided resolver.
 func Start(_ *config.Config, resolver *router.Resolver) {
 	startHTTPRedirect()
 	startHTTPSProxy(resolver)
 }
 
-// Start with CLI
+// StartWithOverride is used by the CLI. It loads the initial
+// configuration, watches for changes and applies CLI overrides
+// for ports at runtime.
 func StartWithOverride(override *ConfigOverride, resolver *router.Resolver) {
 	const configPath = "config.yaml"
 
-	// Грузим начальный конфиг и включаем hot-reload
+	// Load the initial config and enable hot-reload
 	config.MustLoadInitial(configPath)
 	config.WatchAndReload(configPath)
 
@@ -42,19 +48,18 @@ func StartWithOverride(override *ConfigOverride, resolver *router.Resolver) {
 				override.Apply(cfg)
 			}
 
-			// 💡 можно будет реализовать динамический `Restart` сервера тут, если конфиг изменится
-			// пока просто лог
+			// it will be possible to implement dynamic `Restart` of the server here if the config changes
 			log.Printf("[proxy] Current config — HTTP: %d, HTTPS: %d, domains: %s / %s",
 				cfg.Server.HTTPPort, cfg.Server.HTTPSPort,
 				cfg.Server.DomainMain, cfg.Server.DomainSecond,
 			)
 
-			// Просто спим — без перезапуска
+			// Just sleep - no reboot
 			time.Sleep(30 * time.Second)
 		}
 	}()
 
-	// Первый запуск — с актуальным конфигом
+	// First launch - with current config
 	cfg := config.GetConfig()
 
 	if override != nil {
@@ -64,7 +69,10 @@ func StartWithOverride(override *ConfigOverride, resolver *router.Resolver) {
 	Start(cfg, resolver)
 }
 
-// 🔐 HTTPS с TLS + SNI + ReverseProxy
+// HTTPS с TLS + SNI + ReverseProxy
+// startHTTPSProxy starts the main HTTPS server with TLS
+// certificates and SNI support. Requests are routed through
+// the reverse proxy handler built by buildRootHandler.
 func startHTTPSProxy(resolver *router.Resolver) {
 	cfg := config.GetConfig()
 	mainCert, err := tls.LoadX509KeyPair(cfg.Server.SSLCertMain, cfg.Server.SSLKeyMain)
@@ -119,6 +127,9 @@ func startHTTPSProxy(resolver *router.Resolver) {
 }
 
 // (root)
+// buildRootHandler returns the top-level HTTP handler. It serves
+// static files and dispatches requests to domain-specific handlers
+// or dynamic resolver based on the Host header.
 func buildRootHandler(_ *config.Config, resolver *router.Resolver) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Serve static assets
@@ -131,7 +142,7 @@ func buildRootHandler(_ *config.Config, resolver *router.Resolver) http.Handler 
 		}
 		domain := strings.ToLower(r.Host)
 
-		// 🧠 Берём актуальный конфиг на каждый запрос
+		// We take the current config for each request
 		cfg := config.GetConfig()
 
 		handler := buildDomainHandler(cfg, domain)
@@ -144,6 +155,9 @@ func buildRootHandler(_ *config.Config, resolver *router.Resolver) http.Handler 
 	})
 }
 
+// buildDomainHandler creates a request multiplexer for a single
+// domain using routes from the configuration. The mux is cached
+// for subsequent requests.
 func buildDomainHandler(cfg *config.Config, domain string) http.Handler {
 	muxMu.Lock()
 	defer muxMu.Unlock()
@@ -155,7 +169,7 @@ func buildDomainHandler(cfg *config.Config, domain string) http.Handler {
 	mux := http.NewServeMux()
 	registered := make(map[string]bool)
 
-	// 🔁 Пройдём по всем роутам из YAML
+	// Let's go through all the routes from YAML
 	for _, loc := range cfg.Server.Locations {
 		if !strings.EqualFold(loc.Domain, domain) {
 			continue
@@ -175,6 +189,8 @@ func buildDomainHandler(cfg *config.Config, domain string) http.Handler {
 	return mux
 }
 
+// createProxyHandler builds a reverse proxy for a single route
+// and applies security and CORS middleware.
 func createProxyHandler(loc config.LocationConfig) http.Handler {
 	var handler http.Handler
 
@@ -187,7 +203,7 @@ func createProxyHandler(loc config.LocationConfig) http.Handler {
 	// Apply security chain
 	handler = security.ApplySecurityChain(handler, loc.RequireBearer)
 
-	// Apply CORS if needed (после безопасности, до ServeHTTP)
+	// Apply CORS if needed (after security, before ServeHTTP)
 	if loc.Cors {
 		handler = HandleCORS(handler)
 	}
