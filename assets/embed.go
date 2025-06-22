@@ -12,7 +12,7 @@ var staticFiles embed.FS
 
 // Static returns the embedded static file system.
 func Static() fs.FS {
-	f, err := fs.Sub(staticFiles, "static")
+	f, err := fs.Sub(staticFiles, "assets/static")
 	if err != nil {
 		return staticFiles
 	}
