@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # // © 2023 Devinsidercode CORP. Licensed under the MIT License.
 set -e
 
