@@ -39,6 +39,8 @@ echo "[*] Installing systemd unit..."
 sudo mkdir -p /etc/systemd/system/
 sudo cp systemd/deadendproxy.service /etc/systemd/system/deadendproxy.service
 
+# echo "[✔] DeadEndProxy fully removed." # can remove dir
+
 echo "[*] Restarting systemd..."
 sudo systemctl daemon-reload
 sudo systemctl enable deadendproxy
