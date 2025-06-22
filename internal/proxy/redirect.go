@@ -1,4 +1,6 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package proxy implements the HTTP redirect from port 80 to HTTPS.
 package proxy
 
 import (
@@ -9,10 +11,11 @@ import (
 	"DeadEndProxy/config"
 )
 
-// startHTTPRedirect запускает редирект HTTP → HTTPS
+// startHTTPRedirect spins up a separate HTTP server that
+// redirects all traffic to the HTTPS port.
 func startHTTPRedirect() {
 	go func() {
-		cfg := config.GetConfig() // ✅ теперь он сам знает, где взять актуальный конфиг
+		cfg := config.GetConfig()
 		addr := ":" + strconv.Itoa(cfg.Server.HTTPPort)
 		log.Printf("🌐 HTTP: %s (redirect → HTTPS)", addr)
 
