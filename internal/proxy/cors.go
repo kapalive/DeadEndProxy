@@ -1,11 +1,15 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package proxy provides a simple CORS middleware used by the
+// reverse proxy to handle cross-origin requests.
 package proxy
 
 import (
 	"net/http"
 )
 
-// HandleCORS — middleware, добавляющий CORS-заголовки
+// HandleCORS adds permissive CORS headers to the response
+// and handles preflight OPTIONS requests.
 func HandleCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
