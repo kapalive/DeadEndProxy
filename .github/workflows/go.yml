@@ -40,7 +40,7 @@ jobs:
 
       - name: Build binary
         run: |
-          go build -v ./cmd/main.go -o deadendproxy-bin
+          go build -v -o deadendproxy-bin ./cmd
 
       - name: Run tests
         run: go test ./...
