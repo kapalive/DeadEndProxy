@@ -61,7 +61,7 @@ jobs:
           prepare: |
             pkg install -y go git bash
           run: |
-            echo "🔥 PATH: $(pwd)"
+            echo "PATH: $(pwd)"
             find assets/static
             go version
             go build -buildvcs=false -v ./cmd/main.go -o deadendproxy-bsd
