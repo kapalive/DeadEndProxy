@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # © 2023 Devinsidercode CORP. Licensed under the MIT License.
 CONFIG_PATH="/etc/deadendproxy/config.yaml"
 BINARY="/usr/local/bin/deadendproxy-bin"
