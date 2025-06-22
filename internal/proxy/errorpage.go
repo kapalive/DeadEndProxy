@@ -1,4 +1,7 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package proxy contains helpers for rendering a simple HTML
+// error page when upstream services are unavailable.
 package proxy
 
 import (
@@ -7,7 +10,8 @@ import (
 	"time"
 )
 
-// writeErrorPage outputs a simple HTML error message similar to nginx style.
+// writeErrorPage renders a minimalistic HTML error page similar
+// to the style used by nginx.
 func writeErrorPage(w http.ResponseWriter, status int) {
 	text := http.StatusText(status)
 	if text == "" {
