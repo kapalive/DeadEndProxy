@@ -1,4 +1,7 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package proxy wraps the Go standard library reverse proxy to
+// provide custom error handling and WebSocket support.
 package proxy
 
 import (
@@ -8,7 +11,8 @@ import (
 	"net/url"
 )
 
-// NewSingleHostReverseProxy — обычный HTTP reverse proxy
+// NewSingleHostReverseProxy creates a basic HTTP reverse proxy
+// with custom timeout error handling.
 func NewSingleHostReverseProxy(target string) *httputil.ReverseProxy {
 	u, err := url.Parse(target)
 	if err != nil {
@@ -21,8 +25,9 @@ func NewSingleHostReverseProxy(target string) *httputil.ReverseProxy {
 	return rp
 }
 
-// NewWebSocketReverseProxy — WebSocket proxy (на основе обычного)
+// NewWebSocketReverseProxy creates a reverse proxy suitable for
+// WebSocket connections.
 func NewWebSocketReverseProxy(target string) *httputil.ReverseProxy {
-	// Здесь можно будет потом вставить custom Director, Upgrader, Logger и т.п.
+	// Here you can then insert a custom Director, Upgrader, Logger, etc.
 	return NewSingleHostReverseProxy(target)
 }
