@@ -34,3 +34,5 @@ echo "[ℹ] You can now run it manually:"
 echo "    $ /usr/local/bin/deadendproxy-bsd"
 echo
 echo "[⚙] To autostart it, create an rc.d script or run via tmux/supervisord/etc."
+
+# echo "[✔] DeadEndProxy fully removed." # can remove dir
