@@ -53,7 +53,8 @@ DeadEndProxy/
 │ └── security/
 │ └── security.go
 ├── scripts/
-│ └── deadendproxy # CLI wrapper script
+│ └── deadendproxy-linux # CLI wrapper script
+│ └── deadendproxy-bsd
 ├── systemd/
 │ └── deadendproxy.service # systemd unit file
 ├── test.png # Debug downloaded image
