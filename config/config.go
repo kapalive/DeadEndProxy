@@ -1,4 +1,7 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package config provides YAML configuration loading and hot
+// reloading logic for DeadEndProxy.
 package config
 
 import (
@@ -12,7 +15,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ===== Конфиг для одной локации =====
+// ===== Config for one location =====
 type LocationConfig struct {
 	Path          string `yaml:"path"`
 	ProxyPass     string `yaml:"proxy_pass,omitempty"`
@@ -23,7 +26,7 @@ type LocationConfig struct {
 	Domain        string `yaml:"-"`
 }
 
-// ===== Конфиг для сервера =====
+// ===== Server config =====
 type ServerConfig struct {
 	HTTPPort      int
 	HTTPSPort     int
@@ -37,7 +40,7 @@ type ServerConfig struct {
 	Locations     []LocationConfig
 }
 
-// ===== Конфиг для YAML =====
+// ===== YAML config =====
 type yamlDomain struct {
 	Domain          string `yaml:"domain"`
 	RedirectToHTTPS bool   `yaml:"redirect_to_https"`
@@ -61,7 +64,9 @@ type Config struct {
 	Server ServerConfig
 }
 
-// ===== Загрузка конфига =====
+// ===== Loading config =====
+// MustLoadConfig loads the YAML configuration and panics
+// if an error occurs.
 func MustLoadConfig(path string) *Config {
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -70,6 +75,9 @@ func MustLoadConfig(path string) *Config {
 	return cfg
 }
 
+
+// LoadConfig reads the YAML config from disk and converts
+// it into the internal Config structure.
 func LoadConfig(path string) (*Config, error) {
 	raw, err := os.ReadFile(path)
 	if err != nil {
@@ -123,16 +131,19 @@ func LoadConfig(path string) (*Config, error) {
 			SSLKeyMain:    keyMain,
 			SSLCertSecond: certSecond,
 			SSLKeySecond:  keySecond,
-			Webroot:       "./webroot", // default, или сделай параметром
+			Webroot:       "./webroot", // default
 			Locations:     allLocations,
 		},
 	}, nil
 }
 
+// parsePort trims a leading ':' and converts the string
+// representation of a port to an int.
 func parsePort(p string) int {
 	return mustAtoi(strings.TrimPrefix(p, ":"))
 }
 
+// mustAtoi converts string to int and ignores the error.
 func mustAtoi(s string) int {
 	n, _ := strconv.Atoi(s)
 	return n
@@ -143,12 +154,15 @@ var (
 	configMu      sync.RWMutex
 )
 
+// GetConfig returns the currently loaded configuration.
 func GetConfig() *Config {
 	configMu.RLock()
 	defer configMu.RUnlock()
 	return currentConfig
 }
 
+// MustLoadInitial loads the initial config at startup and
+// stores it in the global variable.
 func MustLoadInitial(path string) {
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -159,6 +173,8 @@ func MustLoadInitial(path string) {
 	configMu.Unlock()
 }
 
+// WatchAndReload watches the config file and reloads it
+// automatically when it changes.
 func WatchAndReload(path string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
