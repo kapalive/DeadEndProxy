@@ -83,7 +83,6 @@ func (r *Resolver) ResolveDomain(ctx context.Context, domain string) (*RouteEntr
 	return route, nil
 }
 
-}
 
 // fetchFromCore queries the fallback core API for domain
 // resolution when other methods fail.
