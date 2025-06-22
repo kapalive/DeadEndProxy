@@ -45,7 +45,7 @@ jobs:
       - name: Run tests
         run: go test ./...
 
- build-bsd:
+  build-bsd:
     name: Build on FreeBSD
     runs-on: ubuntu-latest
 
@@ -59,21 +59,10 @@ jobs:
           release: '13.2'
           mem: 2048
           prepare: |
-            echo "📦 Установка Go и Git"
-            pkg install -y go git
+            pkg install -y go git bash
           run: |
-            echo "📂 embed static check"
+            echo "🔥 PATH: $(pwd)"
             find assets/static
-
-            echo "🧱 Go version:"
             go version
-
-            echo "🚀 Build:"
-            go build -v ./cmd/main.go -o deadendproxy-bsd
-
-            echo "🧪 Run tests:"
+            go build -buildvcs=false -v ./cmd/main.go -o deadendproxy-bsd
             go test ./...
-
-            echo "🛠 Проверка BSD-скрипта:"
-            chmod +x scripts/deadendproxy-bsd
-            ./scripts/deadendproxy-bsd config || true
