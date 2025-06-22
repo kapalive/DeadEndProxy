@@ -1,0 +1,15 @@
+# systemd service definition for running DeadEndProxy
+[Unit]
+Description=DeadEndProxy reverse proxy service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/deadendproxy-bin
+WorkingDirectory=/etc/deadendproxy
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

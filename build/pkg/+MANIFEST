@@ -1,0 +1,14 @@
+cat > build/pkg/+MANIFEST <<EOF
+name: deadendproxy
+version: 1.0.0
+origin: net/deadendproxy
+comment: Secure proxy server written in Go
+arch: freebsd:amd64
+www: https://github.com/devinsidercode/DeadEndProxy
+maintainer: admin@devinsidercode.com
+prefix: /
+desc: |
+  DeadEndProxy is a lightweight proxy with static fallback pages.
+  Written in Go and works with rc.d or systemd.
+deps: []
+EOF
