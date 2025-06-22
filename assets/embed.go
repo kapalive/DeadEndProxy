@@ -6,13 +6,12 @@ import (
 	"embed"
 	"io/fs"
 )
-
-//go:embed assets/static/*
+//go:embed static/*
 var staticFiles embed.FS
 
 // Static returns the embedded static file system.
 func Static() fs.FS {
-	f, err := fs.Sub(staticFiles, "assets/static")
+	f, err := fs.Sub(staticFiles, "static")
 	if err != nil {
 		return staticFiles
 	}
