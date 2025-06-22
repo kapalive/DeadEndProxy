@@ -50,8 +50,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Run in FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
 
       - name: Run in FreeBSD VM
         uses: vmactions/freebsd-vm@v1
@@ -59,10 +59,9 @@ jobs:
           release: '13.2'
           mem: 2048
           prepare: |
-            pkg install -y go git bash
+            pkg install -y go git
           run: |
-            echo "PATH: $(pwd)"
-            find assets/static
+            sh ./scripts/deadendproxy-bsd
             go version
             go build -buildvcs=false -v ./cmd/main.go -o deadendproxy-bsd
             go test ./...
