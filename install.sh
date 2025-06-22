@@ -1,5 +1,8 @@
 #!/bin/sh
 # // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+#
+# Automated installation script for setting up DeadEndProxy
+# along with systemd integration.
 set -e
 
 echo "[*] Checking the environment..."
