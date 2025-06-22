@@ -1,0 +1,50 @@
+name: 🐞 Bug Report
+description: Report a reproducible problem in the code or behavior
+title: "[BUG] <short description>"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out this bug report with as much detail as possible. This will help us fix the issue faster.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Go version, architecture, etc.
+      placeholder: "e.g. Debian 12, Go 1.22, x86_64"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe what you expected vs what actually occurred.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reliably reproduce this issue.
+      placeholder: |
+        1. Run the binary...
+        2. Make a request to...
+        3. Observe error...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs and output
+      description: Paste console output, logs, or crash reports if available.
+      placeholder: |
+        $ ./deadendproxy-bin
+        panic: ...
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

@@ -1,0 +1,24 @@
+name: 🧱 Tech Debt
+description: Log tech debt that should be paid off later
+title: "[DEBT] <short description>"
+labels: [tech-debt]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to capture areas where shortcuts were taken and need improvement in the future.
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What was the compromise or shortcut made?
+  - type: textarea
+    id: impact
+    attributes:
+      label: Current Impact
+      description: Is it causing bugs, maintenance issues, or scaling problems?
+  - type: textarea
+    id: proposed-fix
+    attributes:
+      label: Proposed Fix
+      description: How can we pay off this tech debt?

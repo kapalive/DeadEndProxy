@@ -1,0 +1,22 @@
+name: ❓ Question
+description: Ask a question about the project
+title: "[QUESTION] <short summary>"
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask your question. Maintainers or community members will try to help.
+  - type: textarea
+    id: question
+    attributes:
+      label: What's your question?
+      description: Be as specific and detailed as possible.
+    validations:
+      required: true
+  - type: input
+    id: context
+    attributes:
+      label: Context (optional)
+      description: Where in the project you ran into this?
+      placeholder: "config.yaml, proxy.go, etc"

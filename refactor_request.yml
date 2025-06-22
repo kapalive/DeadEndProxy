@@ -1,0 +1,24 @@
+name: 🔨 Refactor Suggestion
+description: Suggest a refactoring to improve maintainability or structure
+title: "[REFACTOR] <short description>"
+labels: [refactor]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to suggest refactoring existing code, structure, or design without changing functionality.
+  - type: textarea
+    id: target
+    attributes:
+      label: Target code area
+      description: Which files, modules, or components need refactoring?
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why refactor?
+      description: What's the technical or architectural reason for this change?
+  - type: textarea
+    id: risks
+    attributes:
+      label: Potential Risks
+      description: Will this introduce breaking changes or require heavy testing?

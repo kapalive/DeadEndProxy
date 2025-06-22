@@ -1,0 +1,35 @@
+name: 💡 Feature Request
+description: Suggest a new idea or improvement
+title: "[FEATURE] <short description>"
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want to propose a new feature? You're in the right place!
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Clearly describe what you want to add or change.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature valuable? What problem does it solve?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Did you consider other approaches? List them here.
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Project Impact
+      options:
+        - label: Improves user experience
+        - label: Improves performance or scalability
+        - label: Improves maintainability
+        - label: Adds completely new functionality
