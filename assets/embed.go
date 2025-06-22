@@ -7,7 +7,7 @@ import (
 	"io/fs"
 )
 
-//go:embed static/*
+//go:embed ../webroot/static/*
 var staticFiles embed.FS
 
 // Static returns the embedded static file system.
