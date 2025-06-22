@@ -1,3 +1,6 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
 name: Go CI
 
 on:
@@ -30,15 +33,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Build
-        run: go build ./...
+      - name: List assets (debug)
+        run: |
+          echo "✅ Текущий путь: $PWD"
+          find . -name 'logo-full.png'
+
+      - name: Build binary
+        run: |
+          go build -v ./cmd/main.go -o deadendproxy-bin
 
       - name: Run tests
         run: go test ./...
 
-  build-bsd:
+ build-bsd:
     name: Build on FreeBSD
-    runs-on: ubuntu-latest  # базовая ОС, внутри запускается VM
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -47,11 +56,24 @@ jobs:
       - name: Run in FreeBSD VM
         uses: vmactions/freebsd-vm@v1
         with:
-          release: '13.2'  # можно выбрать нужную версию FreeBSD
+          release: '13.2'
           mem: 2048
           prepare: |
+            echo "📦 Установка Go и Git"
             pkg install -y go git
           run: |
+            echo "📂 embed static check"
+            find assets/static
+
+            echo "🧱 Go version:"
             go version
-            go build ./...
+
+            echo "🚀 Build:"
+            go build -v ./cmd/main.go -o deadendproxy-bsd
+
+            echo "🧪 Run tests:"
             go test ./...
+
+            echo "🛠 Проверка BSD-скрипта:"
+            chmod +x scripts/deadendproxy-bsd
+            ./scripts/deadendproxy-bsd config || true
