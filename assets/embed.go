@@ -7,7 +7,7 @@ import (
 	"io/fs"
 )
 
-//go:embed /assets/static/*
+//go:embed assets/static/*
 var staticFiles embed.FS
 
 // Static returns the embedded static file system.
