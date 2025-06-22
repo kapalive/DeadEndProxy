@@ -35,7 +35,7 @@ jobs:
 
       - name: List assets (debug)
         run: |
-          echo "✅ Текущий путь: $PWD"
+          echo "Current path: $PWD"
           find . -name 'logo-full.png'
 
       - name: Build binary
@@ -61,7 +61,7 @@ jobs:
           prepare: |
             pkg install -y go git
           run: |
-            sh ./scripts/deadendproxy-bsd
+            sh ./scripts/deadendproxy-bsd.sh
             go version
             go build -buildvcs=false -v ./cmd/main.go -o deadendproxy-bsd
             go test ./...
