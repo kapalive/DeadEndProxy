@@ -1,4 +1,7 @@
 // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+//
+// Package proxy provides runtime configuration overrides
+// for command line parameters.
 package proxy
 
 import (
@@ -13,6 +16,8 @@ type ConfigOverride struct {
 	HTTPSPort string
 }
 
+// Apply updates the given configuration struct using the
+// values provided by the CLI overrides.
 func (o *ConfigOverride) Apply(cfg *config.Config) {
 	if o.HTTPPort != "" {
 		port := mustInt(o.HTTPPort)
@@ -27,6 +32,7 @@ func (o *ConfigOverride) Apply(cfg *config.Config) {
 	}
 }
 
+// mustInt converts a string to int and panics on error.
 func mustInt(val string) int {
 	n, err := strconv.Atoi(val)
 	if err != nil {
