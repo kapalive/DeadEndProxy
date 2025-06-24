@@ -115,7 +115,6 @@ func writeErrorPage(w http.ResponseWriter, status int) {
        y="112.71523" />
   </g>
 </svg>
-alt="Devinsider Proxy">
   <h1>%d %s</h1>
   <p>Something went wrong while proxying your request.</p>
   <div class="footer">

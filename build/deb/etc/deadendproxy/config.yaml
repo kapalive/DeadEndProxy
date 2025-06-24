@@ -1,0 +1,36 @@
+#  // © 2023 Devinsidercode CORP. Licensed under the MIT License.
+server:
+  webroot: ./webroot
+listen:
+  http: ":80"
+  https: ":443"
+headers:
+  X-Content-Type-Options: "nosniff"
+  X-Frame-Options: "DENY"
+  X-XSS-Protection: "1; mode=block"
+  Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+
+domains:
+  - domain: your-domain.com
+    ssl:
+      cert_file: /etc/letsencrypt/live/your-domain.com/fullchain.pem
+      key_file: /etc/letsencrypt/live/your-domain.com/privateKey.pem
+    redirect_to_https: true
+    routes:
+      - path: "/core/"
+        proxy_pass: "http://localhost:8080"
+        require_bearer: true
+      - path: "/storage/"
+        proxy_pass: "http://localhost:9090"
+        require_cookie: true
+        cookie_name: session_id
+      - path: "/"
+        proxy_pass: "http://localhost:3000"
+  - domain: manage.eyesync.app             # новый поддомен
+    ssl:
+      cert_file: /etc/letsencrypt/live/my-domain.app/fullchain.pem
+      key_file: /etc/letsencrypt/live/my-domain.app/privkey.pem
+    redirect_to_https: true
+    routes:
+      - path: "/"
+        proxy_pass: "http://localhost:8787"

@@ -4,4 +4,4 @@ Section: net
 Priority: optional
 Architecture: amd64
 Maintainer: Devinsidercode
-Description: Correct DeadEndProxy build with -config support
+Description: DeadEndProxy with working systemd and config.yaml
