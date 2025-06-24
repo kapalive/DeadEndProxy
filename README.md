@@ -232,4 +232,31 @@ rm -rf /usr/local/etc/deadendproxy
 rm /usr/local/sbin/deadendproxy-bin
 ```
 
+## 🔄 Auto Update
+
+Run `scripts/autoupdate.sh` to fetch the latest code, rebuild the
+binary and restart the systemd service:
+
+```bash
+cd /path/to/DeadEndProxy
+./scripts/autoupdate.sh
+```
+
+You can schedule this with `cron` or a `systemd` timer for automatic
+updates.
+
+## 📦 Debian Package
+
+The repository includes a minimal `debian/` directory so the project can
+be packaged as a `.deb` for use in your own APT repository. To build the
+package run:
+
+```bash
+dpkg-buildpackage -us -uc
+```
+
+This produces a deb file that can be distributed to other hosts via
+APT.
+
+
 © 2023 Devinsidercode CORP. Licensed under the MIT License.

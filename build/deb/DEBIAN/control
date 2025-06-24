@@ -4,6 +4,6 @@ Section: net
 Priority: optional
 Architecture: amd64
 Depends: systemd, libc6
-Maintainer: Devinsidercode <devinsidercode@gmail.com>
+Maintainer: Devinsidercode <admin@devinsidercode.com>
 Description: DeadEndProxy - fast proxy router with Go + Embed
  Advanced static-capable reverse proxy with no dependencies.

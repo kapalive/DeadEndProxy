@@ -1,0 +1,4 @@
+deadendproxy-bin usr/local/bin/
+systemd/deadendproxy.service etc/systemd/system/
+config.yaml etc/deadendproxy/
+webroot/static/logo-full.png etc/deadendproxy/webroot/static/

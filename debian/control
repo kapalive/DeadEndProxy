@@ -1,0 +1,13 @@
+Source: deadendproxy
+Section: net
+Priority: optional
+Maintainer: Devinsidercode <admin@devinsidercode.com>
+Build-Depends: debhelper-compat (= 12), golang
+Standards-Version: 4.5.0
+Homepage: https://github.com/devinsidercode/DeadEndProxy
+
+Package: deadendproxy
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: DeadEndProxy reverse proxy
+ Lightweight reverse proxy with dynamic domain routing.
