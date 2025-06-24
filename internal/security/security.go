@@ -54,6 +54,22 @@ func RequireBearerAuthorization(h http.Handler) http.Handler {
 	})
 }
 
+// RequireCookieAuthorization checks for a specific auth cookie and rejects the request if missing.
+func RequireCookieAuthorization(name string) func(http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			c, err := r.Cookie(name)
+			if err != nil || c.Value == "" {
+				w.WriteHeader(444)
+				_, _ = w.Write([]byte("Missing auth cookie"))
+				log.Printf("🚫 Unauthorized request to %s", r.URL.Path)
+				return
+			}
+			h.ServeHTTP(w, r)
+		})
+	}
+}
+
 // TarpitMiddleware introduces a small delay that can help slow down
 // simple malicious traffic.
 func TarpitMiddleware(next http.Handler) http.Handler {
@@ -85,7 +101,7 @@ func FilterMiddleware(next http.Handler) http.Handler {
 
 // ApplySecurityChain wraps the handler with all security middleware
 // in the correct order.
-func ApplySecurityChain(h http.Handler, withBearer bool) http.Handler {
+func ApplySecurityChain(h http.Handler, withBearer bool, cookieName string) http.Handler {
 	chain := h
 	chain = FilterMiddleware(chain)
 	chain = FakeErrorMiddleware(chain)
@@ -93,6 +109,9 @@ func ApplySecurityChain(h http.Handler, withBearer bool) http.Handler {
 	chain = SecurityHeadersMiddleware(chain)
 	if withBearer {
 		chain = RequireBearerAuthorization(chain)
+	}
+	if cookieName != "" {
+		chain = RequireCookieAuthorization(cookieName)(chain)
 	}
 	return chain
 }

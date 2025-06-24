@@ -201,7 +201,7 @@ func createProxyHandler(loc config.LocationConfig) http.Handler {
 	}
 
 	// Apply security chain
-	handler = security.ApplySecurityChain(handler, loc.RequireBearer)
+	handler = security.ApplySecurityChain(handler, loc.RequireBearer, loc.CookieName)
 
 	// Apply CORS if needed (after security, before ServeHTTP)
 	if loc.Cors {

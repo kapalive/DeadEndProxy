@@ -90,8 +90,11 @@ domains:
     routes:
       - path: "/api/"
         proxy_pass: "http://127.0.0.1:8080"
+        require_bearer: true
       - path: "/storage/"
         proxy_pass: "http://127.0.0.1:9090"
+        require_cookie: true
+        cookie_name: session_id
       - path: "/"
         proxy_pass: "http://127.0.0.1:3000"
 ```

@@ -22,6 +22,8 @@ type LocationConfig struct {
 	StaticRoot    string `yaml:"static_root,omitempty"`
 	IsWebSocket   bool   `yaml:"is_websocket,omitempty"`
 	RequireBearer bool   `yaml:"require_bearer,omitempty"`
+	RequireCookie bool   `yaml:"require_cookie,omitempty"`
+	CookieName    string `yaml:"cookie_name,omitempty"`
 	Cors          bool   `yaml:"cors,omitempty"`
 	Domain        string `yaml:"-"`
 }

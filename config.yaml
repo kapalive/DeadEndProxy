@@ -19,8 +19,11 @@ domains:
     routes:
       - path: "/core/"
         proxy_pass: "http://localhost:8080"
+        require_bearer: true
       - path: "/storage/"
         proxy_pass: "http://localhost:9090"
+        require_cookie: true
+        cookie_name: session_id
       - path: "/"
         proxy_pass: "http://localhost:3000"
   - domain: manage.eyesync.app             # новый поддомен
