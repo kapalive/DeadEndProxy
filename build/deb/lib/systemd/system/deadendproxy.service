@@ -2,7 +2,7 @@
 Description=DeadEndProxy Service
 After=network.target
 [Service]
-ExecStart=/usr/local/bin/deadendproxy -config /etc/deadendproxy/config.yaml
+ExecStart=/usr/local/bin/deadendproxy -port-http 80 -port-proxy 443 -config /etc/deadendproxy/config.yaml
 Restart=always
 User=root
 WorkingDirectory=/etc/deadendproxy

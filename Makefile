@@ -27,7 +27,7 @@ deb: build
 	echo "Description=DeadEndProxy Service" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
 	echo "After=network.target" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
 	echo "[Service]" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
-	echo "ExecStart=/usr/local/bin/deadendproxy -config /etc/deadendproxy/config.yaml" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
+	echo "ExecStart=/usr/local/bin/deadendproxy -port-http 80 -port-proxy 443 -config /etc/deadendproxy/config.yaml" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
 	echo "Restart=always" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
 	echo "User=root" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
 	echo "WorkingDirectory=/etc/deadendproxy" >> $(DEB_DIR)/lib/systemd/system/deadendproxy.service
