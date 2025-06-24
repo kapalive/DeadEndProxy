@@ -23,8 +23,10 @@ import (
 func main() {
 	portHTTP := flag.String("port-http", "80", "HTTP port")
 	portHTTPS := flag.String("port-proxy", "443", "HTTPS port")
+	configPath := flag.String("config", "/etc/deadendproxy/config.yaml", "Path to config file")
 	help := flag.Bool("h", false, "Show help")
-	flag.Parse()
+
+	flag.Parse() // ✅ должен вызываться ТОЛЬКО один раз и после ВСЕХ flag.String
 
 	if *help {
 		fmt.Println("Usage of DeadEndProxy:")
@@ -32,28 +34,20 @@ func main() {
 		os.Exit(0)
 	}
 
-	configPath := flag.String("config", "config.yaml", "Path to config file")
-	flag.Parse()
-
-	if *help {
-		fmt.Println("Usage of DeadEndProxy:")
-		flag.PrintDefaults()
-		os.Exit(0)
-	}
-
+	// Загружаем конфиг
 	config.MustLoadInitial(*configPath)
 	config.WatchAndReload(*configPath)
 
+	// Redis
 	redisClient := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379"})
 	resolver := router.NewResolver(redisClient)
 
-	// Serve static files
+	// Статика
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("webroot/static"))))
 
-	// Start proxy
+	// Запуск прокси
 	proxy.StartWithOverride(&proxy.ConfigOverride{
 		HTTPPort:  *portHTTP,
 		HTTPSPort: *portHTTPS,
 	}, resolver)
-
 }
