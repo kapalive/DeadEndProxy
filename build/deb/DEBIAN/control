@@ -1,9 +1,7 @@
 Package: deadendproxy
-Version: 1.0.1
+Version: 1.0.0-3-g871f185-dirty
 Section: net
 Priority: optional
 Architecture: amd64
-Depends: systemd, libc6
-Maintainer: Devinsidercode <admin@devinsidercode.com>
-Description: DeadEndProxy - fast proxy router with Go + Embed
- Advanced static-capable reverse proxy with no dependencies.
+Maintainer: Devinsidercode <dev@devinsidercode.com>
+Description: DeadEndProxy - lightweight Go proxy server
