@@ -1,5 +1,5 @@
 Package: deadendproxy
-Version: 1.0.0-3-g871f185-dirty
+Version: 1.0.0-5-g3e00699-dirty
 Section: net
 Priority: optional
 Architecture: amd64
