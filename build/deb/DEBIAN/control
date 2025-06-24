@@ -1,7 +1,7 @@
 Package: deadendproxy
-Version: 1.0.0-5-g3e00699-dirty
+Version: 1.0.5
 Section: net
 Priority: optional
 Architecture: amd64
-Maintainer: Devinsidercode <dev@devinsidercode.com>
-Description: DeadEndProxy - lightweight Go proxy server
+Maintainer: Devinsidercode
+Description: Correct DeadEndProxy build with -config support
