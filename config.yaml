@@ -25,7 +25,8 @@ domains:
         require_cookie: true
         cookie_name: session_id
       - path: "/"
-        proxy_pass: "http://localhost:3000"
+        static_dir: /var/www/html
+        fallback_index: true
   - domain: manage.eyesync.app             # новый поддомен
     ssl:
       cert_file: /etc/letsencrypt/live/my-domain.app/fullchain.pem

@@ -5,18 +5,18 @@
 package proxy
 
 import (
+	"DeadEndProxy/config"
 	"DeadEndProxy/internal/router"
+	"DeadEndProxy/internal/security"
 	"crypto/tls"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"DeadEndProxy/config"
-	"DeadEndProxy/internal/security"
 )
 
 var domainMuxCache = make(map[string]*http.ServeMux)
@@ -148,6 +148,13 @@ func buildRootHandler(_ *config.Config, resolver *router.Resolver) http.Handler 
 		handler := buildDomainHandler(cfg, domain)
 
 		if handler == nil {
+			// Serve /index.html from the webroot when no domain config exists
+			if r.URL.Path == "/" {
+				indexPath := filepath.Join(cfg.Server.Webroot, "index.html")
+				http.ServeFile(w, r, indexPath)
+				return
+			}
+
 			handler = createDynamicHandler(resolver)
 		}
 
@@ -194,9 +201,26 @@ func buildDomainHandler(cfg *config.Config, domain string) http.Handler {
 func createProxyHandler(loc config.LocationConfig) http.Handler {
 	var handler http.Handler
 
-	if loc.IsWebSocket {
+	switch {
+	case loc.StaticRoot != "":
+		fs := http.FileServer(http.Dir(loc.StaticRoot))
+		base := strings.TrimRight(loc.Path, "/")
+		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			rel := strings.TrimPrefix(r.URL.Path, base)
+			full := filepath.Join(loc.StaticRoot, rel)
+			if _, err := os.Stat(full); err != nil {
+				if loc.FallbackIndex {
+					index := filepath.Join(loc.StaticRoot, "index.html")
+					http.ServeFile(w, r, index)
+					return
+				}
+			}
+			http.StripPrefix(base, fs).ServeHTTP(w, r)
+		})
+	case loc.IsWebSocket:
 		handler = NewWebSocketReverseProxy(loc.ProxyPass)
-	} else {
+
+	default:
 		handler = NewSingleHostReverseProxy(loc.ProxyPass)
 	}
 

@@ -95,8 +95,8 @@ domains:
         proxy_pass: "http://127.0.0.1:9090"
         require_cookie: true
         cookie_name: session_id
-      - path: "/"
-        proxy_pass: "http://127.0.0.1:3000"
+      - static_dir: /var/www/html
+        fallback_index: true
 ```
 Don't forget to place your static files like logo-full.png into:
 

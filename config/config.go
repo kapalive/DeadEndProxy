@@ -19,7 +19,8 @@ import (
 type LocationConfig struct {
 	Path          string `yaml:"path"`
 	ProxyPass     string `yaml:"proxy_pass,omitempty"`
-	StaticRoot    string `yaml:"static_root,omitempty"`
+	StaticRoot    string `yaml:"static_dir,omitempty"`
+	FallbackIndex bool   `yaml:"fallback_index,omitempty"`
 	IsWebSocket   bool   `yaml:"is_websocket,omitempty"`
 	RequireBearer bool   `yaml:"require_bearer,omitempty"`
 	RequireCookie bool   `yaml:"require_cookie,omitempty"`
