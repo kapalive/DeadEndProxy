@@ -17,16 +17,17 @@ import (
 
 // ===== Config for one location =====
 type LocationConfig struct {
-	Path          string `yaml:"path"`
-	ProxyPass     string `yaml:"proxy_pass,omitempty"`
-	StaticRoot    string `yaml:"static_dir,omitempty"`
-	FallbackIndex bool   `yaml:"fallback_index,omitempty"`
-	IsWebSocket   bool   `yaml:"is_websocket,omitempty"`
-	RequireBearer bool   `yaml:"require_bearer,omitempty"`
-	RequireCookie bool   `yaml:"require_cookie,omitempty"`
-	CookieName    string `yaml:"cookie_name,omitempty"`
-	Cors          bool   `yaml:"cors,omitempty"`
-	Domain        string `yaml:"-"`
+	Path          string   `yaml:"path"`
+	ProxyPass     string   `yaml:"proxy_pass,omitempty"`
+	Upstreams     []string `yaml:"upstreams,omitempty"`
+	StaticRoot    string   `yaml:"static_dir,omitempty"`
+	FallbackIndex bool     `yaml:"fallback_index,omitempty"`
+	IsWebSocket   bool     `yaml:"is_websocket,omitempty"`
+	RequireBearer bool     `yaml:"require_bearer,omitempty"`
+	RequireCookie bool     `yaml:"require_cookie,omitempty"`
+	CookieName    string   `yaml:"cookie_name,omitempty"`
+	Cors          bool     `yaml:"cors,omitempty"`
+	Domain        string   `yaml:"-"`
 }
 
 // ===== Server config =====

@@ -21,6 +21,21 @@ import (
 
 var domainMuxCache = make(map[string]*http.ServeMux)
 var muxMu sync.Mutex
+var upstreamIndex = make(map[string]int)
+var upstreamMu sync.Mutex
+
+func pickUpstream(loc config.LocationConfig) string {
+	if len(loc.Upstreams) == 0 {
+		return loc.ProxyPass
+	}
+	key := loc.Domain + loc.Path
+	upstreamMu.Lock()
+	idx := upstreamIndex[key]
+	target := loc.Upstreams[idx%len(loc.Upstreams)]
+	upstreamIndex[key] = (idx + 1) % len(loc.Upstreams)
+	upstreamMu.Unlock()
+	return target
+}
 
 // Start launches both HTTP redirect and HTTPS proxy servers
 // using the provided resolver.
@@ -217,6 +232,13 @@ func createProxyHandler(loc config.LocationConfig) http.Handler {
 			}
 			http.StripPrefix(base, fs).ServeHTTP(w, r)
 		})
+
+	case len(loc.Upstreams) > 0:
+		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			target := pickUpstream(loc)
+			NewSingleHostReverseProxy(target).ServeHTTP(w, r)
+		})
+
 	case loc.IsWebSocket:
 		handler = NewWebSocketReverseProxy(loc.ProxyPass)
 

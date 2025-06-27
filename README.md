@@ -89,7 +89,9 @@ domains:
     redirect_to_https: true
     routes:
       - path: "/api/"
-        proxy_pass: "http://127.0.0.1:8080"
+        upstreams:
+          - http://127.0.0.1:8080
+          - http://127.0.0.1:8081
         require_bearer: true
       - path: "/storage/"
         proxy_pass: "http://127.0.0.1:9090"
@@ -97,6 +99,7 @@ domains:
         cookie_name: session_id
       - static_dir: /var/www/html
         fallback_index: true
+
 ```
 Don't forget to place your static files like logo-full.png into:
 

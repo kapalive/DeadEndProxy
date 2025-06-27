@@ -18,7 +18,10 @@ domains:
     redirect_to_https: true
     routes:
       - path: "/core/"
-        proxy_pass: "http://localhost:8080"
+        upstreams:
+          - http://172.16.6.1:5001
+          - http://172.16.6.2:5001
+          - http://172.16.6.5:5001
         require_bearer: true
       - path: "/storage/"
         proxy_pass: "http://localhost:9090"
