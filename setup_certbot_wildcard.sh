@@ -56,3 +56,5 @@ echo "📍 Certificate path: /etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
 echo "📍 Key path:         /etc/letsencrypt/live/${DOMAIN}/privkey.pem"
 echo "🔁 Auto-renewal is scheduled daily at 03:00 server time."
 echo ""
+
+# chmod +x setup-wildcard-ssl-cloudflare.sh
