@@ -1,10 +1,10 @@
-# systemd service definition for running DeadEndProxy
+# /lib/systemd/system/deadendproxy.service
 [Unit]
 Description=DeadEndProxy reverse proxy service
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/deadendproxy-bin
+ExecStart=/usr/local/bin/deadendproxy -port-http 80 -port-proxy 443 -config /etc/deadendproxy/config.yaml
 WorkingDirectory=/etc/deadendproxy
 Restart=on-failure
 RestartSec=5s
