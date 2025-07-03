@@ -1,7 +1,7 @@
 .PHONY: build deb clean release
 
 APP := deadendproxy
-VERSION := 1.0.5
+VERSION := 1.0.6
 ARCH := amd64
 BUILD_DIR := build
 DEB_DIR := $(BUILD_DIR)/deb
@@ -26,18 +26,18 @@ deb: build
 
 	# ==== SYSTEMD SERVICE ====
 	mkdir -p $(SYSTEMD_DIR)
-	echo "[Unit]" > $(SYSTEMD_DIR)/deadendproxy.service
-	echo "Description=DeadEndProxy Service" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "After=network.target" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "[Service]" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "ExecStart=/usr/local/bin/deadendproxy -port-http 80 -port-proxy 443 -config /etc/deadendproxy/config.yaml" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "Restart=always" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "User=root" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "WorkingDirectory=/etc/deadendproxy" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "[Install]" >> $(SYSTEMD_DIR)/deadendproxy.service
-	echo "WantedBy=multi-user.target" >> $(SYSTEMD_DIR)/deadendproxy.service
+	echo "[Unit]" > $(SYSTEMD_DIR)/$(APP).service
+	echo "Description=DeadEndProxy Service" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "After=network.target" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "[Service]" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "ExecStart=/usr/local/bin/$(APP) -port-http 80 -port-proxy 443 -config /etc/deadendproxy/config.yaml" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "Restart=always" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "User=root" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "WorkingDirectory=/etc/deadendproxy" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "[Install]" >> $(SYSTEMD_DIR)/$(APP).service
+	echo "WantedBy=multi-user.target" >> $(SYSTEMD_DIR)/$(APP).service
 
 	# ==== CONFIG.YAML ====
 	mkdir -p $(CONFIG_DIR)
