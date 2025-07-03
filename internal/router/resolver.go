@@ -31,10 +31,9 @@ func NewResolver(redisClient *redis.Client) *Resolver {
 	return &Resolver{Redis: redisClient}
 }
 
-
 // ResolveDomain resolves a domain to a RouteEntry using Redis,
 // DNS TXT records and finally the core API.
-func (r *Resolver) ResolveDomain(ctx context.Context, domain string) (*RouteEntry, error) {
+func (r *Resolver) ResolveDomain(ctx context.Context, domain string) (RouteEntry, error) {
 	domain = strings.ToLower(domain)
 	key := "routing:" + domain
 
@@ -43,7 +42,7 @@ func (r *Resolver) ResolveDomain(ctx context.Context, domain string) (*RouteEntr
 	if err == nil {
 		var route RouteEntry
 		if err := json.Unmarshal([]byte(val), &route); err == nil {
-			return &route, nil
+			return route, nil
 		}
 	}
 
@@ -56,7 +55,7 @@ func (r *Resolver) ResolveDomain(ctx context.Context, domain string) (*RouteEntr
 				if len(parts) == 3 {
 					username := parts[2]
 
-					route := &RouteEntry{
+					route := RouteEntry{
 						Target:   "http://127.0.0.1:9999", // can be replaced if username is needed
 						Username: username,
 					}
@@ -73,30 +72,30 @@ func (r *Resolver) ResolveDomain(ctx context.Context, domain string) (*RouteEntr
 	// Request to core API (if there is no TXT and Redis)
 	route, err := fetchFromCore(domain)
 	if err != nil {
-		return nil, err
+		return RouteEntry{}, err
 	}
 
 	// Let's cache
 	data, _ := json.Marshal(route)
 	r.Redis.Set(ctx, key, data, time.Hour)
 
-	return route, nil
+	return RouteEntry{}, err
 }
-
 
 // fetchFromCore queries the fallback core API for domain
 // resolution when other methods fail.
-func fetchFromCore(domain string) (*RouteEntry, error) {
+func fetchFromCore(domain string) (RouteEntry, error) {
 	url := fmt.Sprintf("http://127.0.0.1:8080/core/domains/resolve?domain=%s", domain)
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("core unreachable: %w", err)
+		return RouteEntry{}, fmt.Errorf("core unreachable: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("core API returned status %d", resp.StatusCode)
+
+		return RouteEntry{}, fmt.Errorf("core API returned status %d", resp.StatusCode)
 	}
 
 	var result struct {
@@ -105,10 +104,10 @@ func fetchFromCore(domain string) (*RouteEntry, error) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("invalid response from core: %w", err)
+		return RouteEntry{}, fmt.Errorf("invalid response from core: %w", err)
 	}
 
-	return &RouteEntry{
+	return RouteEntry{
 		Target:   result.Target,
 		Username: result.Username,
 	}, nil

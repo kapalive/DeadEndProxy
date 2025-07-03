@@ -19,7 +19,7 @@ func createDynamicHandler(resolver *router.Resolver) http.Handler {
 		ctx := r.Context()
 
 		entry, err := resolver.ResolveDomain(ctx, host)
-		if err != nil || entry == nil {
+		if err != nil {
 			writeErrorPage(w, http.StatusBadGateway)
 			return
 		}
